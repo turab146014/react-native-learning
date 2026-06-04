@@ -92,13 +92,13 @@ const styles = StyleSheet.create({
 
       ios : {
         color : "orange",
-        fontStyle : "bold",
+        fontWeight : "bold",
         fontSize : 25
       },
 
       android : {
         color : "gray",
-        fontStyle : "bold",
+        fontWeight : "bold",
         fontSize : 25
       }
 
