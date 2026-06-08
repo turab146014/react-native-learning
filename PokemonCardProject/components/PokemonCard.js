@@ -55,11 +55,11 @@ export default function PokemonCard({
             </View>
 
             <View style={styles.movesContainer}>
-                <Text style = {styles.movesText}>Moves : {moves.join(",")}</Text>
+                <Text style = {styles.movesText}>Moves : {moves.join(" , ")}</Text>
             </View>
 
             <View style={styles.weaknessContainer}>
-                <Text style={styles.weaknessText}>Weakness : {weakness.join(",")}</Text>
+                <Text style={styles.weaknessText}>Weakness : {weakness.join(" , ")}</Text>
             </View>
 
         </View>
