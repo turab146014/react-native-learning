@@ -5,6 +5,7 @@ import {
   FlatList,
   StatusBar,
   SectionList,
+  ScrollView
 } from "react-native";
 
 import pokemonList from "../../data.json";
@@ -21,7 +22,7 @@ export default function App() {
 
       {/* <ScrollView style={styles.scrollView}>
         {pokemonList.map((pokemon) => {
-          console.log(pokemon.id);
+          // console.log(pokemon.id);
           return (
             <View style={styles.card} key={pokemon.id}>
               <Text style={styles.cardText}>{pokemon.type}</Text>
@@ -29,7 +30,7 @@ export default function App() {
             </View>
           );
         })}
-      </ScrollView> */}
+      </ScrollView>  */}
 
 
       {/* <View style={styles.scrollView}>
@@ -37,7 +38,7 @@ export default function App() {
         <FlatList
           data={pokemonList}
           renderItem={({ item }) => {
-            console.log(item.id);
+            // console.log(item.id);
             return (
               <View style={styles.card}>
                 <Text style={styles.cardText}>{item.type}</Text>
@@ -51,7 +52,7 @@ export default function App() {
           ItemSeparatorComponent={
             <View
               style={{
-                height: 16,
+                height: 18,
               }}
             />
           }
@@ -105,9 +106,9 @@ export default function App() {
               }}
             />
           )}
-        />
+        /> 
 
-      </View>
+       </View>
     </SafeAreaView>
   );
 }
