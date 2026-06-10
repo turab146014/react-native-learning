@@ -1,39 +1,51 @@
 import { View, Text , TextInput, Button, StyleSheet, Image, KeyboardAvoidingView, Platform} from "react-native";
 import {useState} from "react"
-import { Color } from "expo-router";
+
 
 
 export default function App () {
 
-const [username, setUsername] = useState ("");
+const [username, setUsername] = useState("");
 const [password, setPassword] = useState ("");
-const [errors, setErrors] = useState ({});
+const [errors, setErrors] = useState<{
+  username?: string;
+  password?: string;
+}>({});
 
 const validateError = () => {
-  let errors = {};
-  if (!username) errors.username = "Username is Required";
-  if (!password) errors.password = "Password is Required";
-  setErrors (errors);
+  let errors: {
+    username?: string;
+    password?: string;
+  } = {};
 
-  return Object.keys (errors ).length === 0;
+  if (!username) errors.username = "Username is required";
+  if (!password) errors.password = "Password is required";
 
-}
+  setErrors(errors);
+
+  return Object.keys(errors).length === 0;
+};
 
 const handleSubmit = () => {
 
   if (validateError()) {
+
     console.log ("Submitted", username, password);
     setUsername ("");
     setPassword ("");
     setErrors ({});
+
   }
 
 }
 
   return (
+
     <KeyboardAvoidingView style = {styles.container} 
+
     behavior = "padding" 
     keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}>
+      
       <View style = {styles.formCard}>
         <Image  source = {require("../../assets/images/icon.png")}
          style= {styles.image}
@@ -79,6 +91,7 @@ const styles = StyleSheet.create ({
     elevation : 5,
     alignSelf : "stretch",
     gap : 8
+
   },
 
 
@@ -120,6 +133,7 @@ const styles = StyleSheet.create ({
 
     color : "red ",
     marginBottom : 10
+
   }
 
 
