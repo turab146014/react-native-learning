@@ -1,6 +1,17 @@
-import { SafeAreaView } from "react-native-safe-area-context";
-import { StatusBar, StyleSheet, View, FlatList, Text, ActivityIndicator} from "react-native";
-import { useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  StatusBar,
+  ActivityIndicator,
+  TextInput,
+  Button,
+} from "react-native";
+
+import {SafeAreaView} from "react-native-safe-area-context";
+
 
 type Post = {
   id: number;
@@ -8,40 +19,91 @@ type Post = {
   body: string;
 };
 
-export default function App () {
-  
+const App = () => {
+
+
   const [postList, setPostList] = useState<Post[]>([]);
 
-  const [isLoading, setIsLoading] = useState (true);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [isRefreshing, setIsRefreshing] = useState (false); 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const [postTitle, setPostTitle] = useState("");
+
+  const [postBody, setPostBody] = useState("");
+
+  const [isPosting, setIsPosting] = useState(false);
+  
+  const [error, setError] = useState("");
 
   const fetchData = async (limit = 10) => {
-    const response = await fetch ("https://jsonplaceholder.typicode.com/posts?_limit=$(limit)");
-    const data = await response.json();
 
-    setPostList (data);
-    setIsLoading (false);
-  }
+    try {
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/posts?_limit=${limit}`
+      );
+
+      const data = await response.json();
+      setPostList(data);
+      setIsLoading(false);
+      setError("");
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setIsLoading(false);
+      setError("Failed to fetch post list.");
+    }
+
+  };
+
+  const addPost = async () => {
+
+    setIsPosting(true);
+
+    try {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: postTitle,
+            body: postBody,
+          }),
+        }
+      );
+
+
+      const newPost = await response.json();
+      setPostList([newPost, ...postList]);
+      setPostTitle("");
+      setPostBody("");
+      setError("");
+    } catch (error) {
+      console.error("Error adding new post:", error);
+      setError("Failed to add new post.");
+    }
+    setIsPosting(false);
+  };
 
 
 
-  const handleRefresh = () => {
-
-    setIsRefreshing(true)
-    fetchData(20)
-    setIsRefreshing(false)
-
-  }
-
-
-
-  useEffect (() =>  {
+  useEffect(() => {
     fetchData();
-  }, [] )
+  }, []);
 
 
-    if (isLoading) {
+
+ const handleRefresh = async () => {
+  setRefreshing(true);
+  await fetchData(20);
+  setRefreshing(false);
+};
+
+  
+
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -52,90 +114,114 @@ export default function App () {
 
 
 
-
   return (
+    <SafeAreaView style={styles.container}>
 
-  <SafeAreaView style = {styles.container}>
+      {error ? (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : (
 
-    <View style = {styles.listContainer}>
+        <>
+          <View style={styles.inputContainer}>
 
-      
-      <FlatList 
-      data={postList}
-      renderItem= {({item}) => {
+            <TextInput
+              style={styles.input}
+              placeholder="Post Title"
+              value={postTitle}
+              onChangeText={setPostTitle}
+            />
 
-        return (
-          <View style = {styles.card}> 
-            <Text style = {styles.titleText}> {item.title} </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Post Body"
+              value={postBody}
+              onChangeText={setPostBody}
+            />
 
-            <Text style = {styles.bodyText}> {item.body } </Text>
+            <Button
+              title={isPosting ? "Adding..." : "Add Post"}
+              onPress={addPost}
+              disabled={isPosting}
+            />
+
           </View>
-        );
 
-       }}
+          <View style={styles.listContainer}>
+
+            <FlatList
+              data={postList}
+              renderItem={({ item }) => (
+                <View style={styles.card}>
+                  <Text style={styles.nameText}>{item.title}</Text>
+                  <Text style={styles.typeText}>{item.body}</Text>
+                </View>
+              )}
+
+              keyExtractor={(item) => item.id.toString()}
+              ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+              ListEmptyComponent={<Text>No Posts Found</Text>}
+
+              ListHeaderComponent={
+                <Text style={styles.headerText}>Post List</Text>
+              }
+
+              ListFooterComponent={
+                <Text style={styles.footerText}>End of list</Text>
+              }
+
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+            />
+          </View>
+        </>
+      )}
+
+    </SafeAreaView>
+
+  );
+
+};
 
 
 
-      ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-      ListEmptyComponent={<Text>No Posts Found</Text>}
-      ListHeaderComponent={
-      <Text style={styles.headerText}>Post List</Text>
-    }
-      ListFooterComponent={
-      <Text style={styles.footerText}>End of list</Text>
-    }
-     
-
-    
-    refreshing = {isRefreshing}
-    onRefresh= {handleRefresh}
-
-      />
-    </View>
-
-  </SafeAreaView>
+const styles = StyleSheet.create({
 
 
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+    paddingTop: StatusBar.currentHeight,
+  },
+  
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+    paddingTop: StatusBar.currentHeight,
+    justifyContent: "center", // Center the loading spinner
+    alignItems: "center", // Center the loading spinner
+  },
 
+  listContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
 
-)};
-
-const styles = StyleSheet.create ({
-
-  container : {
-
-    flex : 1,
-    backgroundColor : "#f5f5f5",
-    paddingTop : StatusBar.currentHeight,
-
- },
- 
-  listContainer : {
-
-    flex : 1, 
-    paddingHorizontal : 16,
-
- },
-
- card: {
+  card: {
     backgroundColor: "#FFFFFF",
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
   },
 
-  titleText : {
-
-    fontSize : 30
-
+  nameText: {
+    fontSize: 30,
   },
 
-
-  bodyText: {
-
-    fontSize : 20,
-    color : "#66666"
-
+  typeText: {
+    fontSize: 24,
+    color: "#666666",
   },
 
   headerText: {
@@ -144,19 +230,44 @@ const styles = StyleSheet.create ({
     marginBottom: 12,
   },
 
-  
   footerText: {
     fontSize: 24,
     textAlign: "center",
     marginTop: 12,
   },
 
-  loadingContainer : {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-    paddingTop: StatusBar.currentHeight,
-    justifyContent: "center", 
-    alignItems: "center"
-  }
+  inputContainer: {
+    backgroundColor: "#FFFFFF",
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    margin: 16,
+  },
+
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 8,
+    padding: 8,
+    borderRadius: 8,
+  },
+
+  errorContainer: {
+    backgroundColor: "#FFC0CB",
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    margin: 16,
+    alignItems: "center",
+  },
+
+  errorText: {
+    color: "#D8000C",
+    fontSize: 16,
+    textAlign: "center",
+  },
 
 });
+
+export default App;
