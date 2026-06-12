@@ -12,7 +12,7 @@ const CourseListScreen = () => {
           router.push({
             pathname: "/course-details",
             params: {
-              title: "React Native",
+              title: "Turab is doing react native course",
             },
           })
         }
@@ -30,6 +30,7 @@ const CourseListScreen = () => {
           })
         }
       />
+
     </View>
   );
 };

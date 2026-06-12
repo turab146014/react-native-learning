@@ -1,9 +1,11 @@
-import { View, Text, StyleSheet } from "react-native";
-
+import { View, Text, StyleSheet, Button } from "react-native";
+import { router } from "expo-router";
 const SettingsScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>SettingsScreen</Text>
+      <Button title = "Go Back"
+      onPress={() => router.back("/index")}/>
     </View>
   );
 };
